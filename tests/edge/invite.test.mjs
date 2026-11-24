@@ -5,9 +5,10 @@ const env={SUPABASE_URL:'https://example.supabase.co',SUPABASE_PUBLISHABLE_KEYS:
 globalThis.Deno={env:{get:n=>env[n]},serve:()=>{}};
 const co='00000000-0000-4000-8000-000000000001';
 let s; // per-test state
-beforeEach(()=>{s={authValid:true,me:{id:'office-user',email:'owner@example.test'},role:'owner',active:true,lookup:null,deleteError:null,inviteError:null,registerError:null,deleted:[],invites:[],registers:[]}});
+beforeEach(()=>{s={authValid:true,me:{id:'office-user',email:'owner@example.test'},role:'owner',active:true,lookup:null,deleteError:null,inviteError:null,registerError:null,resetError:null,deleted:[],invites:[],registers:[],resets:[]}});
 globalThis.__inviteCreateClient=(url,key)=>({
- auth:{getUser:async()=>s.authValid?{data:{user:s.me},error:null}:{data:{user:null},error:{message:'Invalid'}},
+ auth:{resetPasswordForEmail:async(email,opts)=>{s.resets.push({email,opts,key});return {error:s.resetError?{message:s.resetError}:null}},
+  getUser:async()=>s.authValid?{data:{user:s.me},error:null}:{data:{user:null},error:{message:'Invalid'}},
   admin:{deleteUser:async id=>{s.deleted.push({id,key});return {error:s.deleteError}},
    inviteUserByEmail:async(email,opts)=>{s.invites.push({email,opts,key});return s.inviteError?{data:{user:null},error:{message:s.inviteError}}:{data:{user:{id:'new-user'}},error:null}}}},
  from(){const chain={select(){return this},eq(){return this},single:async()=>({data:{role:s.role,active:s.active},error:null})};return chain},
@@ -32,8 +33,15 @@ test('New person: invite email sent to the main site, then access granted with t
  const r=await call();const body=await r.json();assert.equal(r.status,200);assert.equal(body.invited,true);
  assert.deepEqual(s.invites.map(i=>[i.email,i.opts.redirectTo,i.opts.data.display_name,i.key]),[['new.mover@example.test','https://the-movers-login-dev.vercel.app/','Sam Mover','secret']]);
  assert.deepEqual(s.registers,[{target_company:co,invited_user:'new-user',member_name:'Sam Mover',member_role:'mover',key:'public'}])});
+test('Opened-but-unfinished invite (confirmed, no password): access granted, then a set-password email',async()=>{
+ s.lookup={user_id:'half',confirmed:true,has_membership:true,has_password:false};const r=await call();const body=await r.json();
+ assert.equal(r.status,200);assert.equal(body.password_email,true);assert.equal(s.invites.length,0);assert.equal(s.registers[0].invited_user,'half');
+ assert.deepEqual(s.resets.map(x=>[x.email,x.opts.redirectTo,x.key]),[['new.mover@example.test','https://the-movers-login-dev.vercel.app/','public']])});
+test('If the set-password email fails, the office user is told access exists but the email did not go out',async()=>{
+ s.lookup={user_id:'half',confirmed:true,has_membership:true,has_password:false};s.resetError='Email rate limit exceeded';const r=await call();
+ assert.equal(r.status,502);assert.match((await r.json()).error,/Access is set up.*rate limit/)});
 test('Someone who already has a verified login gets access with no email',async()=>{
- s.lookup={user_id:'existing',confirmed:true,has_membership:true};const body=await (await call({role:'crew_leader'})).json();
+ s.lookup={user_id:'existing',confirmed:true,has_membership:true,has_password:true};const body=await (await call({role:'crew_leader'})).json();
  assert.equal(body.invited,false);assert.equal(s.invites.length,0);assert.equal(s.deleted.length,0);assert.equal(s.registers[0].invited_user,'existing');assert.equal(s.registers[0].member_role,'crew_leader')});
 test('An unconfirmed self sign-up with no access is removed and replaced by a fresh invite',async()=>{
  s.lookup={user_id:'abandoned',confirmed:false,has_membership:false};const r=await call();assert.equal(r.status,200);

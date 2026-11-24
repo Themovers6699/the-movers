@@ -51,11 +51,13 @@ export async function handler(req:Request){
   const admin=createClient(url,secretKey,{auth:{persistSession:false,autoRefreshToken:false}});
   const lookup=await admin.rpc('staff_invite_lookup',{member_email:email});
   if(lookup.error)return reply({error:'Could not check this email. Try again.'},503);
-  const existing=(lookup.data??[])[0] as {user_id:string;confirmed:boolean;has_membership:boolean}|undefined;
+  const existing=(lookup.data??[])[0] as {user_id:string;confirmed:boolean;has_membership:boolean;has_password?:boolean}|undefined;
 
-  let userId:string,invited=false;
+  let userId:string,invited=false,needsPassword=false;
   if(existing?.confirmed){
-   userId=existing.user_id; // already has a working login: just grant access, no email needed
+   userId=existing.user_id;
+   // Confirmed but no password = an invite link was opened but "choose your password" never finished.
+   needsPassword=existing.has_password===false;
   }else{
    if(existing&&!existing.has_membership){
     // An unfinished self sign-up nobody confirmed. Remove it so a stranger who signed up with this
@@ -71,6 +73,12 @@ export async function handler(req:Request){
 
   const registered=await userClient.rpc('register_invited_member',{target_company:data.company_id,invited_user:userId,member_name:name,member_role:data.role});
   if(registered.error)return reply({error:registered.error.message,invited},400);
+  if(needsPassword){
+   const anon=createClient(url,publicKey,{auth:{persistSession:false,autoRefreshToken:false}});
+   const reset=await anon.auth.resetPasswordForEmail(email,{redirectTo:siteFor(origin)});
+   if(reset.error)return reply({error:'Access is set up, but the set-password email could not be sent: '+reset.error.message,invited:false},502);
+   return reply({ok:true,invited:false,password_email:true,user_id:userId,note:'Set-password email sent.'});
+  }
   return reply({ok:true,invited,user_id:userId,note:invited?'Invite email sent.':'This person already had a login; access granted.'});
  }catch{return reply({error:'Could not complete the invite. Check Edge Function logs.'},500)}
 }

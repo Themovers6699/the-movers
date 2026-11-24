@@ -10,6 +10,10 @@ verify_jwt = true
 # Called from the browser with the office user's JWT; keep verification ON.
 verify_jwt = true
 
+[functions.movers-staff-email]
+# Called from the browser with the office user's JWT; keep verification ON.
+verify_jwt = true
+
 [functions.movers-sms-webhook]
 # Twilio does not send a Supabase JWT. The function verifies Twilio's signature instead.
 verify_jwt = false

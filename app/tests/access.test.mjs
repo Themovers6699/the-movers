@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {isOffice,canManageStaff,roleLabel,validReturnOrigin} from '../src/access.ts';
+test('Only owners and office admins receive office navigation',()=>{for(const role of ['owner','office_admin']){assert(isOffice(role));assert(canManageStaff(role))}for(const role of ['crew_leader','mover']){assert(!isOffice(role));assert(!canManageStaff(role))}});
+test('Roles have clear labels',()=>{assert.equal(roleLabel('crew_leader'),'Crew leader');assert.equal(roleLabel('mover'),'Mover')});
+test('Auth return URLs stay on HTTPS origin or local development',()=>{assert.equal(validReturnOrigin('https://app.themoverz.com/a'), 'https://app.themoverz.com/');assert.equal(validReturnOrigin('http://localhost:5173'), 'http://localhost:5173/');assert.equal(validReturnOrigin('http://remote.test'),null);assert.equal(validReturnOrigin('javascript:alert(1)'),null)});

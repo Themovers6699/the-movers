@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm run setup
+      - name: App tests
+        run: npm run test:app
+      - name: Database tests (local PostgreSQL via PGlite)
+        run: npm run test:db
+      - name: Edge Function tests (mocked Twilio/Supabase)
+        run: npm run test:edge
+      - name: Production build
+        run: npm run build

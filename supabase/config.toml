@@ -1,0 +1,11 @@
+# Supabase CLI project settings. Contains no secrets.
+# Function secrets (TWILIO_*, etc.) live only in each project's Edge Function Secrets.
+project_id = "the-movers"
+
+[functions.movers-sms-admin]
+# Browser calls carry the signed-in user's JWT; keep verification ON.
+verify_jwt = true
+
+[functions.movers-sms-webhook]
+# Twilio does not send a Supabase JWT. The function verifies Twilio's signature instead.
+verify_jwt = false

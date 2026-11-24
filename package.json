@@ -1,0 +1,16 @@
+{
+  "name": "the-movers",
+  "private": true,
+  "description": "The Movers workspace: web app, Supabase database migrations and Edge Functions.",
+  "scripts": {
+    "setup": "npm ci --prefix app && npm ci --prefix tests/database",
+    "test": "npm run test:app && npm run test:db && npm run test:edge",
+    "test:app": "npm test --prefix app",
+    "test:db": "node tests/database/test_database.mjs",
+    "test:edge": "node --test tests/edge/handlers.test.mjs",
+    "build": "npm run build --prefix app"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

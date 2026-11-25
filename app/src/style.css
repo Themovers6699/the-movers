@@ -17,3 +17,20 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .fieldlabel{font-size:12px;font-weight:600}
 .fieldlabel small{font-weight:400;opacity:.7}
 .pair{display:grid;grid-template-columns:1.6fr 1fr;gap:8px}
+/* Staff record header + green/red status switch */
+.headactions{display:flex;align-items:center;gap:12px}
+.statusswitch{position:relative;display:inline-flex;align-items:center;width:132px;height:40px;padding:0;border:0;border-radius:999px;cursor:pointer;font:inherit;font-weight:700;font-size:13px;letter-spacing:.4px;color:white;transition:background-color .25s ease,box-shadow .25s ease;box-shadow:inset 0 1px 3px rgba(0,0,0,.25);touch-action:pan-y}
+.statusswitch.on{background:#2e8b57}
+.statusswitch.off{background:#c0392b}
+.statusswitch:focus-visible{outline:3px solid #dba931;outline-offset:2px}
+.statusswitch:disabled{cursor:not-allowed;opacity:.75}
+.statusknob{position:absolute;top:4px;left:4px;width:32px;height:32px;border-radius:50%;background:white;box-shadow:0 2px 4px rgba(0,0,0,.3);transition:transform .25s ease}
+.statusswitch.on .statusknob{transform:translateX(92px)}
+.statustext{width:100%;text-align:center;padding:0 14px 0 40px;box-sizing:border-box}
+.statusswitch.on .statustext{padding:0 40px 0 14px}
+@media (prefers-reduced-motion:reduce){.statusswitch,.statusknob{transition:none}}
+/* Status badges in the staff list */
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.badge-on{background:#e3f3ea;color:#1f6b42}
+.badge-off{background:#f8e1df;color:#9b2c22}
+.badge-pending{background:#fbf0d4;color:#8a6510}

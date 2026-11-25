@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {supabase} from './supabase';
 import {roleLabel,errorText,type Role} from './access';
 import {formatPhone} from './phone';
@@ -48,6 +48,8 @@ export default function Staff({companyId,myUserId,myRole,timezone='America/Chica
   setForm({display_name:m.display_name,role:m.role,active:m.active,worker_type:p?.worker_type??'',phone:formatPhone(p?.phone),address_line:p?.address_line??'',city:p?.city??'',state:p?.state??'',postal_code:p?.postal_code??'',start_date:p?.start_date??'',office_notes:p?.office_notes??'',emergency_contact_name:p?.emergency_contact_name??'',emergency_contact_phone:formatPhone(p?.emergency_contact_phone),birthday_month:p?.birthday_month?String(p.birthday_month):'',birthday_day:p?.birthday_day?String(p.birthday_day):'',end_date:p?.end_date??'',separation_reason:p?.separation_reason??'',separation_note:p?.separation_note??'',wage:'',rate_effective_date:today,email:directory[m.user_id]?.email??''});
   window.scrollTo({top:0,behavior:'smooth'})}
  const change=(k:keyof typeof blankForm,v:string|boolean)=>setForm(f=>({...f,[k]:v}));
+ // Switching off pre-fills today's end date; switching on clears the leaving details.
+ const setActive=(on:boolean)=>setForm(f=>({...f,active:on,end_date:on?'':f.end_date||today,separation_reason:on?'':f.separation_reason,separation_note:on?'':f.separation_note}));
 
  async function save(e:React.FormEvent){e.preventDefault();if(busy||!sel)return;setBusy(true);setError('');setMessage('');
   try{const wage=form.wage.trim();if(wage&&!/^\d+(\.\d{1,2})?$/.test(wage))throw Error('Enter the hourly wage as a number, e.g. 18 or 18.50');
@@ -70,9 +72,11 @@ export default function Staff({companyId,myUserId,myRole,timezone='America/Chica
  const birthdays=upcomingBirthdays(members.filter(m=>m.active&&profiles[m.user_id]?.birthday_month&&profiles[m.user_id]?.birthday_day).map(m=>({name:m.display_name,month:profiles[m.user_id].birthday_month!,day:profiles[m.user_id].birthday_day!})),today);
  return <>
   <p role="alert" className="error">{error}</p><p role="status" className="success">{message}</p>
-  {sel&&<section className="panel"><div className="sectionheading"><h2>{sel.display_name}</h2><button type="button" className="secondary" onClick={()=>setSelected('')}>Close</button></div>
+  {sel&&<section className="panel"><div className="sectionheading"><h2>{sel.display_name}</h2><div className="headactions">{canEditRow&&<StatusSwitch active={form.active} locked={isOwnerRow||isMe} onChange={setActive}/>}<button type="button" className="secondary" onClick={()=>setSelected('')}>Close</button></div></div>
    {!canEditRow?<p>Only the owner can edit the owner's record.</p>:<form onSubmit={save}>
     <fieldset disabled={busy}>
+    {!form.active&&<div className="notice"><b>Leaving the company.</b> Their record, contact details and pay history are kept (for the 1099 and your records), but they can't see any company data or be assigned to jobs. Switch back to Active to restore access. <b>Click Save changes below to apply.</b><div className="fields"><label>End date<input type="date" required value={form.end_date} onChange={e=>change('end_date',e.target.value)}/></label><label>Reason<select required value={form.separation_reason} onChange={e=>change('separation_reason',e.target.value)}><option value="">Choose…</option>{REASONS.map(([v,l])=><option key={v} value={v}>{l}</option>)}</select></label><label>Note (optional)<input maxLength={1000} value={form.separation_note} onChange={e=>change('separation_note',e.target.value)}/></label></div></div>}
+    {form.active&&sel&&!sel.active&&<div className="notice"><b>Restoring access.</b> They can sign in and be assigned to jobs again once you click <b>Save changes</b> below.</div>}
     <h3>Access</h3><div className="fields">
      <label>Full name<input required maxLength={150} value={form.display_name} onChange={e=>change('display_name',e.target.value)}/></label>
      <label>Role{isOwnerRow?<input value="Owner" disabled/>:<select value={form.role} disabled={isMe} onChange={e=>change('role',e.target.value)}><option value="mover">Mover</option><option value="crew_leader">Crew leader</option><option value="office_admin">Office admin</option></select>}</label>
@@ -80,8 +84,6 @@ export default function Staff({companyId,myUserId,myRole,timezone='America/Chica
      <label>Start date<input type="date" value={form.start_date} onChange={e=>change('start_date',e.target.value)}/></label>
      <div className="field"><span className="fieldlabel">Birthday <small>(month and day only)</small></span><div className="pair"><select aria-label="Birthday month" value={form.birthday_month} onChange={e=>{const m=e.target.value;setForm(f=>({...f,birthday_month:m,birthday_day:m&&Number(f.birthday_day)>daysInMonth(Number(m))?'':f.birthday_day}))}}><option value="">Month</option>{Array.from({length:12},(_,i)=><option key={i+1} value={i+1}>{monthName(i+1)}</option>)}</select><select aria-label="Birthday day" value={form.birthday_day} disabled={!form.birthday_month} onChange={e=>change('birthday_day',e.target.value)}><option value="">Day</option>{Array.from({length:form.birthday_month?daysInMonth(Number(form.birthday_month)):31},(_,i)=><option key={i+1} value={i+1}>{i+1}</option>)}</select></div></div>
     </div>
-    <label className="inlinecheck"><input type="checkbox" checked={form.active} disabled={isOwnerRow||isMe} onChange={e=>{const on=e.target.checked;setForm(f=>({...f,active:on,end_date:on?'':f.end_date||today,separation_reason:on?'':f.separation_reason,separation_note:on?'':f.separation_note}))}}/>Active: can sign in and be assigned to jobs{(isOwnerRow||isMe)?' (you cannot switch off your own or the owner\'s access)':''}</label>
-    {!form.active&&<div className="notice"><b>Leaving the company.</b> Their record, contact details and pay history are kept (for the 1099 and your records), but they can't see any company data or be assigned to jobs. Tick Active again to restore access.<div className="fields"><label>End date<input type="date" required value={form.end_date} onChange={e=>change('end_date',e.target.value)}/></label><label>Reason<select required value={form.separation_reason} onChange={e=>change('separation_reason',e.target.value)}><option value="">Choose…</option>{REASONS.map(([v,l])=><option key={v} value={v}>{l}</option>)}</select></label><label>Note (optional)<input maxLength={1000} value={form.separation_note} onChange={e=>change('separation_note',e.target.value)}/></label></div></div>}
     <h3>Contact</h3><div className="fields">
      <label>Phone<input type="tel" value={form.phone} onChange={e=>change('phone',e.target.value)} placeholder="(469) 555-1234"/></label>
      <label>Street address<input maxLength={200} value={form.address_line} onChange={e=>change('address_line',e.target.value)}/></label>
@@ -113,7 +115,7 @@ export default function Staff({companyId,myUserId,myRole,timezone='America/Chica
    <p>Click a person to view or edit their details, pay and access.</p>
    {birthdays.length>0&&<div className="notice"><b>Upcoming birthdays:</b> {birthdays.map(b=>b.name+' – '+monthName(b.month).slice(0,3)+' '+b.day+(b.inDays===0?' (today!)':b.inDays===1?' (tomorrow)':' (in '+b.inDays+' days)')).join(' · ')}</div>}
    {loading?<p>Loading staff…</p>:<div className="tablewrap"><table className="clickable"><thead><tr><th>Name</th><th>Role</th><th>Status</th><th>Phone</th><th>Email</th><th>Wage</th></tr></thead><tbody>
-    {visible.map(m=><tr key={m.user_id} tabIndex={0} className={m.user_id===selected?'selected':''} onClick={()=>open(m)} onKeyDown={e=>{if(e.key==='Enter')open(m)}}><td>{m.display_name}</td><td>{roleLabel(m.role)}</td><td>{status(m)}</td><td>{formatPhone(profiles[m.user_id]?.phone)||'—'}</td><td>{directory[m.user_id]?.email??'—'}</td><td>{currentRate(m.user_id)?money(currentRate(m.user_id)!.hourly_rate_cents)+'/h':'—'}</td></tr>)}
+    {visible.map(m=><tr key={m.user_id} tabIndex={0} className={m.user_id===selected?'selected':''} onClick={()=>open(m)} onKeyDown={e=>{if(e.key==='Enter')open(m)}}><td>{m.display_name}</td><td>{roleLabel(m.role)}</td><td><span className={'badge '+(!m.active?'badge-off':directory[m.user_id]?.invite_pending?'badge-pending':'badge-on')}>{status(m)}</span></td><td>{formatPhone(profiles[m.user_id]?.phone)||'—'}</td><td>{directory[m.user_id]?.email??'—'}</td><td>{currentRate(m.user_id)?money(currentRate(m.user_id)!.hourly_rate_cents)+'/h':'—'}</td></tr>)}
    </tbody></table></div>}
   </section>
   <section className="panel"><h2>Invite a staff member</h2><p>Enter their name, email and role. They get an email from The Movers with a link to choose their own password. If they already have a login, access is granted right away.</p>
@@ -124,4 +126,18 @@ export default function Staff({companyId,myUserId,myRole,timezone='America/Chica
    </div><button className="primary" disabled={busy}>{busy?'Sending…':'Send invite'}</button></form>
   </section>
  </>;
+}
+
+// Green "Active" / red "Inactive" pill switch. Click, tap or press Space/Enter to flip; Left/Right arrows (or a sideways swipe) pick a side.
+function StatusSwitch({active,locked,onChange}:{active:boolean;locked:boolean;onChange:(on:boolean)=>void}){
+ const startX=useRef<number|null>(null),swiped=useRef(false); // refs survive re-renders between pointer-up and click
+ return <button type="button" role="switch" aria-checked={active} aria-label={active?'Active: can sign in and be assigned to jobs':'Inactive: no access'}
+  className={'statusswitch '+(active?'on':'off')} disabled={locked}
+  title={locked?'You cannot switch off your own or the owner\'s access':active?'Click to deactivate':'Click to restore access'}
+  onClick={()=>{if(swiped.current){swiped.current=false;return}onChange(!active)}}
+  onKeyDown={e=>{if(e.key==='ArrowRight'){e.preventDefault();onChange(true)}if(e.key==='ArrowLeft'){e.preventDefault();onChange(false)}}}
+  onPointerDown={e=>{startX.current=e.clientX;swiped.current=false}}
+  onPointerUp={e=>{const x0=startX.current;startX.current=null;if(x0!==null&&Math.abs(e.clientX-x0)>20){swiped.current=true;onChange(e.clientX>x0)}}}>
+  <span className="statusknob" aria-hidden="true"/><span className="statustext">{active?'Active':'Inactive'}</span>
+ </button>
 }

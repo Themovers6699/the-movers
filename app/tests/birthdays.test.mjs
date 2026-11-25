@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {daysUntilBirthday,upcomingBirthdays,daysInMonth,monthName} from '../src/birthdays.ts';
+test('Days until a birthday, including today and across New Year',()=>{assert.equal(daysUntilBirthday(11,24,'2026-11-24'),0);assert.equal(daysUntilBirthday(12,3,'2026-11-24'),9);assert.equal(daysUntilBirthday(1,2,'2026-12-31'),2);assert.equal(daysUntilBirthday(11,23,'2026-11-24'),364)});
+test('Feb 29 birthdays are celebrated on Feb 28 in non-leap years',()=>{assert.equal(daysUntilBirthday(2,29,'2027-02-27'),1);assert.equal(daysUntilBirthday(2,29,'2028-02-28'),1)});
+test('Upcoming list keeps only the next 30 days, soonest first',()=>{const r=upcomingBirthdays([{name:'Ann',month:12,day:20},{name:'Bob',month:11,day:30},{name:'Cy',month:6,day:1}],'2026-11-24');assert.deepEqual(r.map(p=>[p.name,p.inDays]),[['Bob',6],['Ann',26]])});
+test('Month helpers',()=>{assert.equal(daysInMonth(2),29);assert.equal(daysInMonth(4),30);assert.equal(daysInMonth(12),31);assert.equal(monthName(3),'March')});

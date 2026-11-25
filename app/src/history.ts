@@ -84,3 +84,27 @@ export function describeJobHistory(rows: AuditRow[]): HistoryEntry[] {
   }
   return entries.reverse(); // newest first
 }
+
+// ---- Generic single-table history (used for customers) -------------------------------------
+export type Field=[key:string,label:string,format:(v:unknown)=>string];
+const list=(v:unknown)=>Array.isArray(v)&&v.length?v.join(', '):'none';
+const referral=(v:unknown)=>v?String(v).replaceAll('_',' / ').replace('friend / family','friend/family'):'blank';
+export const CUSTOMER_FIELDS:Field[]=[
+  ['first_name','First name',plain],['last_name','Last name',plain],['email','Email',plain],
+  ['phone','Phone',plain],['phone2','Second phone',plain],['referral_source','Referral source',referral],
+  ['tags','Tags',list],['office_notes','Office notes',v=>v?'updated':'cleared'],
+];
+/** One entry per save (transaction + actor), listing only changed fields. Newest first. */
+export function describeRecordHistory(rows:AuditRow[],fields:Field[],createdText='Created'):HistoryEntry[]{
+  const groups=new Map<string,AuditRow[]>();
+  for(const r of [...rows].sort((a,b)=>a.id-b.id)){const k=`${r.at}|${r.actor??''}`;if(!groups.has(k))groups.set(k,[]);groups.get(k)!.push(r)}
+  const out:HistoryEntry[]=[];
+  for(const g of groups.values()){
+    const changes:string[]=[];
+    if(g.some(r=>r.action==='INSERT'))changes.push(createdText);
+    else{const before=g[0].old_row??{},after=g[g.length-1].new_row??{};
+      for(const [k,label,fmt] of fields)if(!same(before[k],after[k]))changes.push(k==='office_notes'?`Office notes ${fmt(after[k])}`:`${label}: ${fmt(before[k])} → ${fmt(after[k])}`)}
+    if(changes.length)out.push({at:g[0].at,actor:g[0].actor,changes});
+  }
+  return out.reverse();
+}

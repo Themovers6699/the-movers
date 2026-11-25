@@ -1,4 +1,4 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';import {describeJobHistory} from '../src/history.ts';
+import {test} from 'node:test';import assert from 'node:assert/strict';import {describeJobHistory,describeRecordHistory,CUSTOMER_FIELDS} from '../src/history.ts';
 const job={id:'j1',company_id:'c',status:'booked',customer_name:'Test',move_date:'2026-12-01',arrival_time:'09:00:00',scheduled_minutes:120,row_version:3,truck_label:'Truck 1',quoted_total_cents:50000};
 const owner='u-owner',lead='u-lead',mover='u-mover';
 const at1='2026-11-24T18:00:00Z',at2='2026-11-24T19:30:00Z';
@@ -33,4 +33,15 @@ test('Saves with no visible change are left out; dashboard edits have no actor',
  const rows=[{id:1,table_name:'jobs',row_id:'j1',action:'UPDATE',actor:null,at:at1,old_row:job,new_row:{...job,row_version:9}},
   {id:2,table_name:'jobs',row_id:'j1',action:'UPDATE',actor:null,at:at2,old_row:job,new_row:{...job,status:'cancelled'}}];
  assert.deepEqual(describeJobHistory(rows),[{at:at2,actor:null,changes:['Status: booked → cancelled']}]);
+});
+test('Customer history lists only changed fields, readable, newest first',()=>{
+ const c={id:'c1',company_id:'c',first_name:'Maria',last_name:'Cruz',email:'m@x.test',phone:'+14695550100',phone2:null,referral_source:null,tags:[],office_notes:null};
+ const rows=[
+  {id:1,table_name:'customers',row_id:'c1',action:'INSERT',actor:'u1',at:'2026-11-25T10:00:00Z',old_row:null,new_row:c},
+  {id:2,table_name:'customers',row_id:'c1',action:'UPDATE',actor:'u2',at:'2026-11-25T11:00:00Z',old_row:c,new_row:{...c,last_name:'Cruz-Lopez',referral_source:'friend_family',tags:['vip'],office_notes:'Gate 12'}},
+  {id:3,table_name:'customers',row_id:'c1',action:'UPDATE',actor:null,at:'2026-11-25T12:00:00Z',old_row:c,new_row:{...c}}];
+ const h=describeRecordHistory(rows,CUSTOMER_FIELDS,'Customer created');
+ assert.equal(h.length,2);
+ assert.deepEqual(h[0].changes,['Last name: Cruz → Cruz-Lopez','Referral source: blank → friend/family','Tags: none → vip','Office notes updated']);
+ assert.deepEqual(h[1].changes,['Customer created']);
 });

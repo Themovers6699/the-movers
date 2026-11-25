@@ -34,3 +34,17 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .badge-on{background:#e3f3ea;color:#1f6b42}
 .badge-off{background:#f8e1df;color:#9b2c22}
 .badge-pending{background:#fbf0d4;color:#8a6510}
+/* Customers: tags, status badges, muted text */
+.tagpicker{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.tagpill{padding:8px 16px;border-radius:999px;border:1px solid #d5dee5;background:white;color:#1a3041;font:inherit;font-weight:700;font-size:13px;cursor:pointer;transition:background-color .2s ease}
+.tagpill:focus-visible{outline:3px solid #dba931;outline-offset:2px}
+.tag-repeat{background:#e3edf7;color:#24527a;border-color:#b9cfe4}
+.tag-vip{background:#fbf0d4;color:#8a6510;border-color:#ecd28a}
+.tagbadge{margin-left:8px;font-size:11px;padding:2px 8px}
+.badge-done{background:#e6eaee;color:#3a5263}
+.muted{color:#778995;font-size:13px}
+/* Estimate form: existing-customer search */
+.customerpicker{margin-bottom:12px}
+.pickresults{list-style:none;margin:-4px 0 14px;padding:0;border:1px solid #d5dee5;border-radius:6px;overflow:hidden}
+.pickresults button{display:block;width:100%;text-align:left;padding:10px 12px;background:white;border:0;border-bottom:1px solid #eef2f5;font:inherit;cursor:pointer;color:#1a3041}
+.pickresults button:hover,.pickresults button:focus{background:#f5f7f9;outline:none}

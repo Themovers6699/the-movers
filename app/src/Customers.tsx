@@ -8,7 +8,8 @@ type Customer={id:string;name:string;first_name:string|null;last_name:string|nul
 type Move={id:string;move_date:string;status:string;quoted_total_cents:number|null;pick_up_address:string;drop_off_address:string};
 
 export const REFERRALS:[string,string][]=[['google','Google'],['facebook','Facebook'],['instagram','Instagram'],['yelp','Yelp'],['nextdoor','Nextdoor'],['friend_family','Friend / family'],['realtor','Realtor'],['apartment_manager','Apartment manager'],['repeat_customer','Repeat customer'],['website','Our website'],['other','Other']];
-const TAGS:[string,string][]=[['repeat','Repeat'],['vip','VIP']];
+export const TAGS:[string,string][]=[['repeat','Repeat'],['vip','VIP'],['referral','Referral']];
+export const tagLabel=(t:string)=>TAGS.find(x=>x[0]===t)?.[1]??t;
 const referralLabel=(v:string|null)=>REFERRALS.find(r=>r[0]===v)?.[1]??'—';
 const money=(c:number|null)=>c===null?'—':(c/100).toLocaleString('en-US',{style:'currency',currency:'USD'});
 const blank={id:'',first_name:'',last_name:'',email:'',phone:'',phone2:'',referral_source:'',tags:[] as string[],office_notes:''};
@@ -84,7 +85,7 @@ export default function Customers({companyId}:{companyId:string}){
    <p className="muted">{loading?'Searching…':query?`${total} match${total===1?'':'es'}`:`${total} customers`}{!loading&&total>rows.length?` · showing the first ${rows.length}; search to narrow it down`:''}</p>
    <div className="tablewrap"><table className="clickable"><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Heard from</th><th>Moves</th><th>Last move</th></tr></thead><tbody>
     {rows.map(c=><tr key={c.id} tabIndex={0} className={c.id===openId?'selected':''} onClick={()=>open(c)} onKeyDown={e=>{if(e.key==='Enter')open(c)}}>
-     <td>{c.name}{c.tags.map(t=><span key={t} className={'badge tag-'+t+' tagbadge'}>{t==='vip'?'VIP':'Repeat'}</span>)}</td>
+     <td>{c.name}{c.tags.map(t=><span key={t} className={'badge tag-'+t+' tagbadge'}>{tagLabel(t)}</span>)}</td>
      <td>{formatPhone(c.phone)||'—'}{c.phone2&&<div className="muted">{formatPhone(c.phone2)}</div>}</td><td>{c.email||'—'}</td><td>{referralLabel(c.referral_source)}</td><td>{c.job_count}</td><td>{c.last_move_date??'—'}</td></tr>)}
    </tbody></table>{!loading&&!rows.length&&<p>No matching customers.</p>}</div>
   </section>

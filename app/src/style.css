@@ -48,3 +48,4 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .pickresults{list-style:none;margin:-4px 0 14px;padding:0;border:1px solid #d5dee5;border-radius:6px;overflow:hidden}
 .pickresults button{display:block;width:100%;text-align:left;padding:10px 12px;background:white;border:0;border-bottom:1px solid #eef2f5;font:inherit;cursor:pointer;color:#1a3041}
 .pickresults button:hover,.pickresults button:focus{background:#f5f7f9;outline:none}
+.tag-referral{background:#e6f4ec;color:#1f6b42;border-color:#b6dcc5}

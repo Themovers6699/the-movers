@@ -91,3 +91,4 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 @media (max-width:700px){.addonrow{grid-template-columns:1fr 80px 34px}.addontotal{display:none}}
 .ordercell{white-space:nowrap}
 .ordercell .iconbtn+.iconbtn{margin-left:6px}
+.envbadge{display:inline-block;background:#fbf0d4;color:#8a6510;border:1px solid #ecd28a;border-radius:999px;padding:3px 10px;font-weight:800;letter-spacing:1px}

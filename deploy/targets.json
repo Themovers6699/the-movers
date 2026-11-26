@@ -1,0 +1,17 @@
+{
+  "_note": "Deploy targets. No secrets: project IDs and public URLs only. Used by scripts/deploy.ps1.",
+  "testing": {
+    "supabaseUrl": "https://yohmygccqdomiynnkobn.supabase.co",
+    "vercelProjectName": "the-movers-login-dev",
+    "vercelProjectId": "prj_FaWs86SyLzZUuKQeF52dIjTRUhDu",
+    "vercelOrgId": "team_SElrwJpdeJ4bkqO88w2q5LRW",
+    "address": "https://the-movers-login-dev.vercel.app"
+  },
+  "production": {
+    "supabaseUrl": "https://oeiotkbwpnvvjxweppwi.supabase.co",
+    "vercelProjectName": "the-movers-app",
+    "vercelProjectId": "",
+    "vercelOrgId": "team_SElrwJpdeJ4bkqO88w2q5LRW",
+    "address": "https://app.themoverz.com"
+  }
+}

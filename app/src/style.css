@@ -60,7 +60,7 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .stoptools{margin-left:auto;display:flex;gap:6px}
 .iconbtn{width:34px;height:34px;border-radius:6px;border:1px solid #d5dee5;background:white;color:#1a3041;font-size:15px;cursor:pointer}
 .iconbtn:disabled{opacity:.35;cursor:not-allowed}
-.iconbtn.danger{color:#a33c38}
+.iconbtn-remove{color:#a33c38}
 .stopgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 12px}
 @media (max-width:700px){.stopgrid{grid-template-columns:1fr 1fr}}
 .addstop{align-self:flex-start}
@@ -75,3 +75,4 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .stopwarning{background:#f8e1df;color:#9b2c22;border:1px solid #eab7b2;border-radius:8px;padding:10px 14px;font-weight:600;font-size:13px}
 .stopnotice{background:#e3f3ea;color:#1f6b42;border-radius:8px;padding:8px 14px;font-size:13px}
 .formactions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.formactions .danger{margin-top:0}

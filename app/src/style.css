@@ -76,3 +76,16 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .stopnotice{background:#e3f3ea;color:#1f6b42;border-radius:8px;padding:8px 14px;font-size:13px}
 .formactions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
 .formactions .danger{margin-top:0}
+/* Pricing settings tables */
+.ratetable td{padding:6px 8px;vertical-align:middle}
+.ratetable input,.ratetable select{margin:0;padding:9px 10px;min-width:80px}
+.ratetable select{background:white;color:#1a3041;border-color:#d5dee5}
+.ratetable tr.inactive input{opacity:.55}
+/* Estimate add-ons */
+.addons{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.addonrow{display:grid;grid-template-columns:minmax(0,3fr) 110px 100px 34px;gap:10px;align-items:center}
+.addonrow select{margin:0;background:white;color:#1a3041;border-color:#d5dee5}
+.addonrow input{margin:0}
+.addontotal{text-align:right;font-weight:700}
+.addons>button{align-self:flex-start}
+@media (max-width:700px){.addonrow{grid-template-columns:1fr 80px 34px}.addontotal{display:none}}

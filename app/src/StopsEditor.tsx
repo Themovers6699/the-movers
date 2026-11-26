@@ -1,18 +1,15 @@
-// Editor for a job's 2–5 addresses ("stops"). First must be a pick-up, last a drop-off (checked on save).
-export type Stop={kind:'pickup'|'dropoff';address:string;location_type:string;bedrooms:string;floor:string;unit:string;access_notes:string};
-export const LOCATION_TYPES:[string,string][]=[['house','House'],['townhouse','Townhouse'],['apartment','Apartment'],['high_rise','High-rise'],['storage','Storage unit'],['office','Office'],['warehouse','Warehouse'],['retail','Retail'],['other','Other']];
-const HAS_BEDROOMS=['house','townhouse','apartment','high_rise','other',''];
-export const emptyStop=(kind:'pickup'|'dropoff'):Stop=>({kind,address:'',location_type:'',bedrooms:'',floor:'',unit:'',access_notes:''});
-/** Stored rows (numbers/nulls) → editable strings. */
-export function toStops(rows:{kind:string;address:string;location_type:string|null;bedrooms:number|null;floor:number|null;unit:string|null;access_notes:string|null}[]):Stop[]{
- return rows.map(r=>({kind:r.kind==='dropoff'?'dropoff':'pickup',address:r.address,location_type:r.location_type??'',bedrooms:r.bedrooms==null?'':String(r.bedrooms),floor:r.floor==null?'':String(r.floor),unit:r.unit??'',access_notes:r.access_notes??''}));
-}
-export const bedroomLabel=(b:string|number|null)=>b===''||b===null||b===undefined?'':Number(b)===0?'Studio':`${b} BR`;
+import {useEffect,useState} from 'react';
+// Editor for a job's 2–5 addresses ("stops"). First must be a pick-up, last a drop-off (shown live, enforced on save).
+import {emptyStop,stopProblems,LOCATION_TYPES,HAS_BEDROOMS,type Stop} from './stops';
+export {emptyStop,toStops,stopProblems,bedroomLabel,LOCATION_TYPES,type Stop} from './stops';
 
 export default function StopsEditor({stops,onChange,disabled=false}:{stops:Stop[];onChange:(next:Stop[],addressChanged:boolean)=>void;disabled?:boolean}){
+ const [notice,setNotice]=useState('');
+ useEffect(()=>{if(!notice)return;const t=setTimeout(()=>setNotice(''),5000);return()=>clearTimeout(t)},[notice]);
+ const problems=stopProblems(stops);
  const set=(i:number,key:keyof Stop,value:string)=>onChange(stops.map((s,k)=>k===i?{...s,[key]:value}:s),key==='address');
  const move=(i:number,d:-1|1)=>{const n=[...stops];[n[i],n[i+d]]=[n[i+d],n[i]];onChange(n,true)};
- const remove=(i:number)=>onChange(stops.filter((_,k)=>k!==i),true);
+ const remove=(i:number)=>{const a=stops[i].address.trim();if(a&&!window.confirm(`Remove stop ${i+1} (${a})?`))return;onChange(stops.filter((_,k)=>k!==i),true);setNotice(`Stop ${i+1}${a?' ('+a+')':''} removed.`)};
  // New stops go just before the final drop-off (e.g. a second pick-up at a storage unit).
  const add=()=>{const n=[...stops];n.splice(n.length-1,0,emptyStop('pickup'));onChange(n,true)};
  return <div className="stops">
@@ -35,6 +32,8 @@ export default function StopsEditor({stops,onChange,disabled=false}:{stops:Stop[
    </div>
    <label>Access notes for the crew<input maxLength={1000} value={s.access_notes} disabled={disabled} onChange={e=>set(i,'access_notes',e.target.value)} placeholder="Gate code, elevator reservation, parking…"/></label>
   </div>)}
+  {problems.length>0&&<div className="stopwarning" role="alert">{problems.map(p=><div key={p}>⚠ {p}</div>)}</div>}
+  {notice&&<div className="stopnotice" role="status">{notice}</div>}
   {stops.length<5&&<button type="button" className="secondary addstop" disabled={disabled} onClick={add}>+ Add another address ({5-stops.length} left)</button>}
  </div>;
 }

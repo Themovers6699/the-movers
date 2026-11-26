@@ -72,3 +72,6 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .miniswitch button:focus-visible{outline:3px solid #dba931;outline-offset:-3px}
 .pair.even{grid-template-columns:1fr 1fr}
 .servicetag{display:inline-block;align-self:flex-start;margin:2px 0;padding:2px 8px;border-radius:999px;background:#e3edf7;color:#24527a;font-weight:700;font-size:11px}
+.stopwarning{background:#f8e1df;color:#9b2c22;border:1px solid #eab7b2;border-radius:8px;padding:10px 14px;font-weight:600;font-size:13px}
+.stopnotice{background:#e3f3ea;color:#1f6b42;border-radius:8px;padding:8px 14px;font-size:13px}
+.formactions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}

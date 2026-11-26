@@ -27,6 +27,8 @@ export default function PricingSettings({companyId}:{companyId:string}){
  const addRate=()=>{const used=rates.map(r=>Number(r.crew_size));const next=[2,3,4,5,6,7,8,9,10,1].find(n=>!used.includes(n));if(!next)return;
   const last=rates[rates.length-1];setRates(rs=>[...rs,{crew_size:String(next),weekday:'',weekend:'',base:last?.base??'',perMile:last?.perMile??'1.20',roundTo:last?.roundTo??'5'}].sort((a,b)=>Number(a.crew_size)-Number(b.crew_size)))};
  const setItem=(i:number,k:keyof Item,v:string|boolean)=>setItems(xs=>xs.map((x,j)=>j===i?{...x,[k]:v}:x));
+ // Reorder: the saved order is the order shown on estimates.
+ const moveItem=(i:number,d:-1|1)=>setItems(xs=>{const n=[...xs];[n[i],n[i+d]]=[n[i+d],n[i]];return n});
 
  async function savePricing(e:React.FormEvent){e.preventDefault();if(busy)return;setBusy(true);setError('');setMessage('');
   try{
@@ -74,9 +76,10 @@ export default function PricingSettings({companyId}:{companyId:string}){
   </fieldset></form>
   <form onSubmit={saveItems}><fieldset disabled={busy}>
    <section className="panel"><h2>Add-ons and packing materials</h2>
-    <p>Add these to estimates with a quantity. Switch an item off instead of deleting it: quotes that already include it keep their price.</p>
-    <div className="tablewrap"><table className="ratetable"><thead><tr><th>Name</th><th>Type</th><th>Unit</th><th>Price $</th><th>Available</th></tr></thead><tbody>
+    <p>Add these to estimates with a quantity. Use ↑ ↓ to set the order they appear in on estimates. Switch an item off instead of deleting it: quotes that already include it keep their price.</p>
+    <div className="tablewrap"><table className="ratetable"><thead><tr><th>Order</th><th>Name</th><th>Type</th><th>Unit</th><th>Price $</th><th>Available</th></tr></thead><tbody>
      {items.map((x,i)=><tr key={x.id||'new'+i} className={x.active?'':'inactive'}>
+      <td className="ordercell"><button type="button" className="iconbtn" disabled={i===0} onClick={()=>moveItem(i,-1)} aria-label={`Move ${x.name||'add-on'} up`} title="Move up">↑</button><button type="button" className="iconbtn" disabled={i===items.length-1} onClick={()=>moveItem(i,1)} aria-label={`Move ${x.name||'add-on'} down`} title="Move down">↓</button></td>
       <td><input aria-label="Add-on name" required maxLength={100} value={x.name} onChange={e=>setItem(i,'name',e.target.value)}/></td>
       <td><select aria-label="Type" value={x.category} onChange={e=>setItem(i,'category',e.target.value)}><option value="fee">Fee</option><option value="material">Packing material</option></select></td>
       <td><input aria-label="Unit" maxLength={20} value={x.unit_label} onChange={e=>setItem(i,'unit_label',e.target.value)} placeholder="each"/></td>

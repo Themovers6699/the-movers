@@ -89,3 +89,5 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .addontotal{text-align:right;font-weight:700}
 .addons>button{align-self:flex-start}
 @media (max-width:700px){.addonrow{grid-template-columns:1fr 80px 34px}.addontotal{display:none}}
+.ordercell{white-space:nowrap}
+.ordercell .iconbtn+.iconbtn{margin-left:6px}

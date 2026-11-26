@@ -49,3 +49,26 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .pickresults button{display:block;width:100%;text-align:left;padding:10px 12px;background:white;border:0;border-bottom:1px solid #eef2f5;font:inherit;cursor:pointer;color:#1a3041}
 .pickresults button:hover,.pickresults button:focus{background:#f5f7f9;outline:none}
 .tag-referral{background:#e6f4ec;color:#1f6b42;border-color:#b6dcc5}
+/* Job stops editor */
+.stops{display:flex;flex-direction:column;gap:12px;margin:6px 0 14px}
+.stopcard{border:1px solid #d5dee5;border-left:5px solid #43667a;border-radius:8px;padding:12px 14px;background:white}
+.stopcard.pickup{border-left-color:#2e8b57}
+.stopcard.dropoff{border-left-color:#dba931}
+.stophead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.stophead select{width:auto;margin:0;background:white;color:#1a3041;border-color:#d5dee5;font-weight:700;padding:8px 10px}
+.stopnum{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#1a3041;color:white;font-weight:700;font-size:13px;flex:none}
+.stoptools{margin-left:auto;display:flex;gap:6px}
+.iconbtn{width:34px;height:34px;border-radius:6px;border:1px solid #d5dee5;background:white;color:#1a3041;font-size:15px;cursor:pointer}
+.iconbtn:disabled{opacity:.35;cursor:not-allowed}
+.iconbtn.danger{color:#a33c38}
+.stopgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 12px}
+@media (max-width:700px){.stopgrid{grid-template-columns:1fr 1fr}}
+.addstop{align-self:flex-start}
+/* Small pill switch (Truck needed) */
+.miniswitch{display:inline-flex;border:1px solid #d5dee5;border-radius:999px;overflow:hidden}
+.miniswitch button{border:0;background:white;padding:9px 16px;font:inherit;font-weight:700;font-size:13px;color:#55758a;cursor:pointer}
+.miniswitch button[aria-pressed="true"].yes{background:#2e8b57;color:white}
+.miniswitch button[aria-pressed="true"].no{background:#a33c38;color:white}
+.miniswitch button:focus-visible{outline:3px solid #dba931;outline-offset:-3px}
+.pair.even{grid-template-columns:1fr 1fr}
+.servicetag{display:inline-block;align-self:flex-start;margin:2px 0;padding:2px 8px;border-radius:999px;background:#e3edf7;color:#24527a;font-weight:700;font-size:11px}

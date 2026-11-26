@@ -8,7 +8,7 @@ export default function JobHistory({companyId,jobId,refreshKey}:{companyId:strin
  useEffect(()=>{let live=true;setLoading(true);setError('');
   Promise.all([
    supabase.from('audit_log').select('id,table_name,row_id,action,actor,at,old_row,new_row').eq('company_id',companyId)
-    .in('table_name',['jobs','job_assignments','job_office_notes']).or(`row_id.eq.${jobId},row_id.like.${jobId}/*`).order('id',{ascending:false}).limit(300),
+    .in('table_name',['jobs','job_assignments','job_office_notes','job_stops']).or(`row_id.eq.${jobId},row_id.like.${jobId}/*`).order('id',{ascending:false}).limit(300),
    supabase.from('company_members').select('user_id,display_name').eq('company_id',companyId)
   ]).then(([log,members])=>{if(!live)return;if(log.error)throw log.error;if(members.error)throw members.error;
    setEntries(describeJobHistory((log.data??[]) as AuditRow[]));

@@ -45,3 +45,12 @@ test('Customer history lists only changed fields, readable, newest first',()=>{
  assert.deepEqual(h[0].changes,['Last name: Cruz → Cruz-Lopez','Referral source: blank → friend/family','Tags: none → vip','Office notes updated']);
  assert.deepEqual(h[1].changes,['Customer created']);
 });
+test('Job history shows window, service type, truck and stop changes',()=>{
+ const rows=[
+  {id:1,table_name:'jobs',row_id:'j1',action:'UPDATE',actor:owner,at:at1,old_row:{...job,arrival_window_end:null,service_type:'full_move',truck_needed:true},new_row:{...job,arrival_window_end:'10:00:00',service_type:'load_only',truck_needed:false}},
+  {id:2,table_name:'job_stops',row_id:'j1',action:'DELETE',actor:owner,at:at1,old_row:{job_id:'j1',position:1},new_row:null},
+  {id:3,table_name:'job_stops',row_id:'j1',action:'INSERT',actor:owner,at:at1,old_row:null,new_row:{job_id:'j1',position:1}},
+  {id:4,table_name:'job_stops',row_id:'j1',action:'INSERT',actor:owner,at:at1,old_row:null,new_row:{job_id:'j1',position:2}},
+  {id:5,table_name:'job_stops',row_id:'j1',action:'INSERT',actor:owner,at:at1,old_row:null,new_row:{job_id:'j1',position:3}}];
+ assert.deepEqual(describeJobHistory(rows)[0].changes,['Window ends: not set → 10:00','Service type: full move → load only','Truck needed: yes → no','Addresses / stop details updated (3 stops)']);
+});

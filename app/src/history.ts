@@ -29,6 +29,9 @@ const FIELDS: [key: string, label: string, format: (v: unknown) => string][] = [
   ['customer_name', 'Customer', plain],
   ['move_date', 'Move date', plain],
   ['arrival_time', 'Arrival time', time],
+  ['arrival_window_end', 'Window ends', time],
+  ['service_type', 'Service type', plain],
+  ['truck_needed', 'Truck needed', yesNo],
   ['scheduled_minutes', 'Scheduled duration', hours],
   ['pick_up_address', 'Pick-up', plain],
   ['drop_off_address', 'Drop-off', plain],
@@ -80,6 +83,10 @@ export function describeJobHistory(rows: AuditRow[]): HistoryEntry[] {
     for (const [user, name] of added) if (!removed.has(user)) changes.push(`Assigned ${name}`);
     for (const [user, name] of removed) if (!added.has(user)) changes.push(`Removed ${name}`);
     if (group.some((r) => r.table_name === 'job_office_notes')) changes.push('Office notes changed');
+    if (group.some((r) => r.table_name === 'job_stops')) {
+      const after = group.filter((r) => r.table_name === 'job_stops' && r.action === 'INSERT').length;
+      changes.push(after ? `Addresses / stop details updated (${after} stops)` : 'Addresses / stop details updated');
+    }
     if (changes.length) entries.push({ at: group[0].at, actor: group[0].actor, changes });
   }
   return entries.reverse(); // newest first

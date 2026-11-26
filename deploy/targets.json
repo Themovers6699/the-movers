@@ -10,7 +10,7 @@
   "production": {
     "supabaseUrl": "https://oeiotkbwpnvvjxweppwi.supabase.co",
     "vercelProjectName": "the-movers-app",
-    "vercelProjectId": "",
+    "vercelProjectId": "prj_wWpUumVRiNfikcMtfUfrUyIykpXm",
     "vercelOrgId": "team_SElrwJpdeJ4bkqO88w2q5LRW",
     "address": "https://app.themoverz.com"
   }

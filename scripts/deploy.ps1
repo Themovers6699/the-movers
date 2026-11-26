@@ -10,7 +10,9 @@ param(
   [switch]$Promote,
   [switch]$SkipTests
 )
-$ErrorActionPreference = 'Stop'
+# 'Continue': in Windows PowerShell 5.1, 'Stop' turns npm/vercel progress output on stderr into fatal errors.
+# Every step's result is checked explicitly below instead.
+$ErrorActionPreference = 'Continue'
 $root = Split-Path $PSScriptRoot -Parent
 Set-Location $root
 $t = (Get-Content (Join-Path $root 'deploy\targets.json') -Raw | ConvertFrom-Json).$Target

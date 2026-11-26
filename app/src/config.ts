@@ -4,7 +4,7 @@
 // The build target is chosen with VITE_TARGET=testing|production (see scripts/deploy.ps1). Default: testing.
 const TARGETS={
  testing:{projectUrl:'https://yohmygccqdomiynnkobn.supabase.co',publishableKey:'sb_publishable_pSyItyg8Kfwv7i6y9dfqiw_k5r2Kvfh',label:'TESTING'},
- production:{projectUrl:'https://oeiotkbwpnvvjxweppwi.supabase.co',publishableKey:'PRODUCTION_PUBLISHABLE_KEY_PENDING',label:''},
+ production:{projectUrl:'https://oeiotkbwpnvvjxweppwi.supabase.co',publishableKey:'sb_publishable_ZhU00v-SFosK4gQJH0SFxA_SC2Srdv-',label:''},
 } as const;
 export const target:keyof typeof TARGETS=import.meta.env.VITE_TARGET==='production'?'production':'testing';
 export const {projectUrl,publishableKey}=TARGETS[target];

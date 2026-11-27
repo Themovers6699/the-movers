@@ -94,3 +94,5 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .envbadge{display:inline-block;background:#fbf0d4;color:#8a6510;border:1px solid #ecd28a;border-radius:999px;padding:3px 10px;font-weight:800;letter-spacing:1px}
 /* Before a workspace is linked there is no side menu: let the page use the full width */
 .workspacebody>.dashboard:only-child{grid-column:1/-1}
+.inlinefield{display:inline-flex;flex-direction:row;align-items:center;gap:8px;font-weight:600}
+.inlinefield input{width:auto;margin:0}

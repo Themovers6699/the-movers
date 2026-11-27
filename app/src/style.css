@@ -131,3 +131,10 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .photoviewer{position:fixed;inset:0;background:rgba(10,20,30,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;z-index:50;color:white}
 .photoviewer img{max-width:100%;max-height:80vh;border-radius:8px}
 @media (max-width:700px){.crew .panel{padding:14px}.contactbtn{flex:1;text-align:center}}
+/* Install-the-app banner */
+.installhint{display:flex;align-items:center;gap:14px;background:white;border:1px solid #dce4e9;border-left:5px solid #dba931;border-radius:10px;padding:12px 14px;margin-bottom:16px;max-width:640px}
+.installhint img{border-radius:9px;flex:none}
+.installhint p{margin:2px 0 0;font-size:13px;color:#3a5263}
+.installactions{margin-left:auto;display:flex;gap:8px;flex:none}
+.installactions button{margin:0;padding:9px 14px}
+@media (max-width:700px){.installhint{flex-wrap:wrap}.installactions{margin-left:0;width:100%}.installactions button{flex:1}}

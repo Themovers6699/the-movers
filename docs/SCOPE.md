@@ -284,6 +284,9 @@ Cutover from prototype: needs 1, 2, 3a, 4
 - **Photos:** movers as well as crew leaders can take job photos.
 - **Location:** tracked only while the crew member is in the company truck using the app. Permission is "while using the app" only, never in the background. For now only the ETA text uses location. Driving-habit monitoring is **deferred**; if added later, it uses a truck-installed GPS tracker (2026-11-24).
 
+- **Phase 2 decisions (2026-11-27):** movers see job basics only (no prices, no customer phone); crew-leader discount up to 20% of the whole job total; crew time edits lock once completed and the crew records full payment (office can correct, with a reason); online with retry, no offline mode in v1. Plan: docs/PHASE2_PLAN.md.
+- **Go-live timing:** production upgrade to Pro and the real import happen together, about a month out, from fresh exports.
+
 ### Still open
 1. **Movers:** what else do they see? Suggested: addresses, times and access notes, but no prices or customer phone.
 2. **20% of what?** Suggested: the job total before the discount (labor + service charge + fees + materials).

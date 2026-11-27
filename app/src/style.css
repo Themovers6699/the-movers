@@ -96,3 +96,38 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .workspacebody>.dashboard:only-child{grid-column:1/-1}
 .inlinefield{display:inline-flex;flex-direction:row;align-items:center;gap:8px;font-weight:600}
 .inlinefield input{width:auto;margin:0}
+/* Crew screens (phone-first) */
+.crew .panel{padding:18px}
+.crewlist{display:flex;flex-direction:column;gap:12px}
+.crewcard{display:flex;flex-direction:column;gap:6px;text-align:left;width:100%;padding:16px;border:1px solid #d5dee5;border-left:6px solid #2e8b57;border-radius:10px;background:white;font:inherit;color:#1a3041;cursor:pointer}
+.crewcard.status-in_progress{border-left-color:#dba931}
+.crewcard.status-completed{border-left-color:#9fb2c0}
+.crewcard.status-cancelled{border-left-color:#a33c38;opacity:.7}
+.crewcard strong{font-size:18px}
+.crewcardtop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.crewcardtop .badge{margin-left:auto}
+.crewroute{font-size:14px}
+.crewtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.crewwhen{font-size:16px}
+.bigbtn{width:100%;padding:18px;font-size:18px;margin-top:8px;border-radius:10px}
+.bigbtn.finish{background:#1a3041;color:white}
+.contactbtns{display:flex;gap:10px;flex-wrap:wrap}
+.contactbtn{display:inline-block;padding:12px 16px;text-decoration:none;font-weight:700}
+.mapslink{display:block;font-weight:700;color:#24527a;text-decoration:none;font-size:16px;margin:4px 0}
+.accessnote{background:#fbf3dc;border-radius:6px;padding:8px 10px;margin:6px 0 0}
+.plainlist{margin:6px 0;padding-left:18px}
+.notelist{list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:8px}
+.notelist li{background:#f5f7f9;border-radius:8px;padding:10px 12px}
+.notelist p{margin:0 0 4px}
+.notelist small{color:#778995}
+/* Photos */
+.photoadd{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.camerabtn{display:block;text-align:center;padding:16px;font-size:17px;border-radius:10px;cursor:pointer}
+.photogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.photothumb{position:relative;aspect-ratio:1;border:0;padding:0;border-radius:8px;overflow:hidden;background:#e6eaee;cursor:pointer}
+.photothumb img{width:100%;height:100%;object-fit:cover;display:block}
+.phototag{position:absolute;left:6px;bottom:6px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(255,255,255,.92)}
+.phototag.tag-damage{background:#f8e1df;color:#9b2c22}
+.photoviewer{position:fixed;inset:0;background:rgba(10,20,30,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;z-index:50;color:white}
+.photoviewer img{max-width:100%;max-height:80vh;border-radius:8px}
+@media (max-width:700px){.crew .panel{padding:14px}.contactbtn{flex:1;text-align:center}}

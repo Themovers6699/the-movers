@@ -32,7 +32,7 @@ $stage = Join-Path ([IO.Path]::GetTempPath()) ("movers-deploy-$Target-" + (Get-D
 New-Item -ItemType Directory -Force (Join-Path $stage '.vercel') | Out-Null
 Copy-Item (Join-Path $root 'app\dist\*') $stage -Recurse
 $host_ = ([uri]$t.supabaseUrl).Host
-$csp = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://$host_ wss://$host_; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+$csp = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://$host_; connect-src 'self' https://$host_ wss://$host_; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
 $vercel = [ordered]@{
   headers = @(@{ source = '/(.*)'; headers = @(
     @{ key = 'X-Content-Type-Options'; value = 'nosniff' },

@@ -1,0 +1,9 @@
+{
+  "name": "the-movers-import",
+  "private": true,
+  "description": "One-time import tool. Reads the owner's files from disk; no customer data is stored in this repository.",
+  "type": "module",
+  "dependencies": {
+    "pg": "^8.13.0"
+  }
+}

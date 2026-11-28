@@ -31,6 +31,16 @@ export function shortWindow(a:string|null,b:string|null){
  return s.ap===e.ap?`${s.n}-${e.n}${e.ap}`:`${s.n}${s.ap}-${e.n}${e.ap}`;
 }
 
+/** Upper-case address with the unit right after the street (owner request):
+ *  "8888 Mermaid Ave, Dallas, TX 75201" + "1328" -> "8888 MERMAID AVE, UNIT 1328, DALLAS, TX 75201".
+ *  When the street and city aren't separated by a comma, the unit goes at the end. */
+export function withUnit(address:string,unit:string|null){
+ const a=address.trim().toUpperCase(),u=(unit??'').trim().toUpperCase().replace(/^(UNIT|APT\.?|APARTMENT|STE\.?|SUITE|#)\s*/,'');
+ if(!u||new RegExp(`(UNIT|APT\\.?|APARTMENT|STE\\.?|SUITE|#)\\s*${u.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}\\b`).test(a))return a;
+ const parts=a.split(',');
+ return parts.length>=3?[parts[0].trim(),`UNIT ${u}`,...parts.slice(1).map(p=>p.trim())].join(', '):`${a}, UNIT ${u}`;
+}
+
 type Job={id:string;status:string;customer_id:string|null;customer_name:string;move_date:string;arrival_time:string|null;arrival_window_end:string|null;pick_up_address:string;drop_off_address:string;crew_size:number;pricing_model:string;hourly_rate_cents:number|null;flat_rate_cents:number|null;service_charge_cents:number|null;deposit_required_cents:number|null;minimum_minutes:number;billing_increment_minutes:number};
 type Stop={position:number;kind:string;address:string;unit:string|null};
 type Line={name:string;quantity:number;total_cents:number};
@@ -47,7 +57,7 @@ export function buildContent(kind:'estimate'|'proposal',job:Job,name:string,stop
  const count=(k:string)=>list.filter(s=>s.kind===k).length;const seen:Record<string,number>={};
  for(const s of list){seen[s.kind]=(seen[s.kind]??0)+1;
   const label=list.length===1?'LOCATION':`${s.kind==='pickup'?'PICK-UP':'DROP-OFF'} LOCATION${count(s.kind)>1?' '+seen[s.kind]:''}`;
-  const addr=s.address.toUpperCase()+(s.unit&&!s.address.toUpperCase().includes(s.unit.toUpperCase())?`, UNIT ${s.unit.toUpperCase()}`:'');
+  const addr=withUnit(s.address,s.unit);
   p.push(`**${label}- ${addr}**`)}
  const dep=`**DEPOSIT REQUIRED-${dollars(job.deposit_required_cents,true)}**`;
  if(job.pricing_model==='flat')p.push(`This move will be completed by a **${job.crew_size}-MAN** crew for a **FLAT RATE OF ${dollars(job.flat_rate_cents)}**. ${dep}`);

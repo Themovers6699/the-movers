@@ -22,7 +22,7 @@ export default function Complaints({companyId,onChanged}:{companyId:string;onCha
  if(viewing)return <Estimates key={viewing} companyId={companyId} initialJobId={viewing} onClose={()=>{setViewing('');setRev(n=>n+1)}} onSaved={onChanged}/>;
  return <section className="panel">
   <div className="sectionheading"><h2>Complaints</h2><div className="miniswitch" role="group" aria-label="Show">{(['open','resolved','all'] as const).map(f=><button key={f} type="button" className="yes" aria-pressed={filter===f} onClick={()=>setFilter(f)}>{f==='open'?'Open':f==='resolved'?'Resolved':'All'}</button>)}</div></div>
-  <p className="muted">Problems customers send from the “Tell us about a problem” button in the thank-you email. Each one is also emailed to your inbox; reply there to answer the customer.</p>
+  <p className="muted">Tell“Tell us about a problem” button in the thank-you email. Each one is also emailed to your inbox; reply there to answer the customer.</p>
   <p className="error" role="alert">{error}</p>
   {loading?<p>Loading…</p>:!rows.length?<div className="empty"><h3>{filter==='open'?'No open complaints.':'Nothing here.'}</h3><p>{filter==='open'?'When a customer reports a problem, it appears here.':''}</p></div>
   :<div className="complaintlist">{rows.map(c=>{const ct=c.customer_id?contacts[c.customer_id]:undefined;const phone=c.contact_phone||formatPhone(ct?.phone);return <article key={c.id} className={'complaint '+c.status}>

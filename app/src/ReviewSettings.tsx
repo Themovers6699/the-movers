@@ -13,7 +13,7 @@ export default function ReviewSettings({companyId}:{companyId:string}){
   catch(e){setError(errorText(e,'Could not change the setting.'))}finally{setBusy(false)}}
  return <section className="panel">
   <div className="sectionheading"><h2>Thank-you &amp; review emails</h2></div>
-  <p>Send the thank-you email automatically <b>24 hours after the crew finishes a move</b>. It goes out between 9 AM and 7 PM, once per move, and never to customers who opted out of emails. It asks the customer to tell you first if anything went wrong, then shows your Google, Facebook, Yelp and BBB review links.</p>
+  <p>Send the thank-you email automatically <b>24 hours after the crew finishes a move</b>. It goes out between 9 AM and 7 PM, once per move, and never to customers who opted out of emails. It invites the customer to message you first with any questions or concerns, then shows your Google, Facebook, Yelp and BBB review links.</p>
   <div className="field"><span className="fieldlabel">Automatic thank-you emails</span><div className="miniswitch" role="group" aria-label="Automatic thank-you emails"><button type="button" className="yes" aria-pressed={on===true} disabled={busy||on===null} onClick={()=>set(true)}>On</button><button type="button" className="no" aria-pressed={on===false} disabled={busy||on===null} onClick={()=>set(false)}>Off</button></div></div>
   <p className="error" role="alert">{error}</p><p className="success" role="status">{message}</p>
  </section>;

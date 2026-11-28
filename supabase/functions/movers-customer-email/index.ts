@@ -5,7 +5,7 @@ import {createClient} from 'npm:@supabase/supabase-js@2.119.0';
 //  * booked    -> full "Written Proposal": the same plus the *** terms (company_settings.proposal_terms), an
 //                 "I agree" link, and the TxDMV Rights & Responsibilities PDF attached. A copy of exactly what was
 //                 sent is kept in job_proposals so the customer's agreement can be proven later.
-//  * completed -> "Thank you": a "Tell us about a problem" button first, then review links (Google, Facebook, Yelp,
+//  * completed -> "Thank you": a "Click to message us directly" button first, then review links (Google, Facebook, Yelp,
 //                 BBB) shown to everyone (no review gating). Skipped for customers who opted out.
 // Requests:
 //  * office (signed-in owner/office admin): send one of the above for a job; or {mode:'schedule'} to turn the
@@ -104,9 +104,9 @@ export function buildEmail(c:Content,site:string,agreeUrl:string|null,problemUrl
  let body:string;
  if(c.kind==='review'){
   const problem=`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 22px 0;"><tr><td style="background:#fff6e0;border-left:4px solid #dba931;border-radius:6px;padding:16px 18px;">
-<p style="margin:0 0 6px 0;font-size:16px;"><b>Was anything not right with your move?</b></p>
+<p style="margin:0 0 6px 0;font-size:16px;"><b>Questions or concerns regarding your move?</b></p>
 <p style="margin:0 0 14px 0;font-size:15px;line-height:1.5;">Please tell us first. We read every message and will do our best to make it right.</p>
-${problemUrl?button(problemUrl,'Tell us about a problem','#dba931','#1a3041'):''}<p style="margin:4px 0 0 0;font-size:14px;">Or call us at <b>469-200-6699</b>, or simply reply to this email.</p></td></tr></table>`;
+${problemUrl?button(problemUrl,'Click to message us directly','#dba931','#1a3041'):''}<p style="margin:4px 0 0 0;font-size:14px;">Or call us at <b>469-200-6699</b>, or simply reply to this email.</p></td></tr></table>`;
   body=c.paragraphs.slice(0,2).map(x=>P(rich(x))).join('\n')+problem+P(rich(c.paragraphs[2]??''))
    +REVIEW_LINKS.map(([n,u])=>button(u,`&#9733; Review us on ${esc(n)}`,'#1a3041','#ffffff')).join('');
  }else{
@@ -117,7 +117,7 @@ ${problemUrl?button(problemUrl,'Tell us about a problem','#dba931','#1a3041'):''
  }
  const html=page(banner+body+P('<b>THANK YOU FOR CHOOSING THE MOVERS</b>','margin-top:18px;')+signature(site));
  const text=c.kind==='review'
-  ?[...c.paragraphs.slice(0,2),'','Was anything not right with your move? Please tell us first so we can make it right:',problemUrl??'','(or call 469-200-6699, or reply to this email)','',c.paragraphs[2]??'',...REVIEW_LINKS.map(([n,u])=>`Review us on ${n}: ${u}`)].map(plain)
+  ?[...c.paragraphs.slice(0,2),'','Questions or concerns regarding your move? Please tell us first. We read every message and will do our best to make it right. Message us directly:',problemUrl??'','(or call 469-200-6699, or reply to this email)','',c.paragraphs[2]??'',...REVIEW_LINKS.map(([n,u])=>`Review us on ${n}: ${u}`)].map(plain)
   :[...c.paragraphs.map(plain),'',...c.terms.map(t=>t?'*** '+plain(t):''),'',
    agreeUrl?`To confirm that you have read and agree to the terms, open: ${agreeUrl}\n(or simply respond to this email)`:'Ready to book, or have questions? Reply to this email or call 469-200-6699.'];
  return {subject,html,text:[...text,'','THANK YOU FOR CHOOSING THE MOVERS','','The Movers · Our Faith Can Move Mountains','469-200-6699 · move@themoverz.com · www.themoverz.com'].join('\n')};
@@ -125,12 +125,12 @@ ${problemUrl?button(problemUrl,'Tell us about a problem','#dba931','#1a3041'):''
 
 /** Email to the office about a customer's problem report. */
 export function buildComplaintEmail(customer:string,moveDate:string,message:string,phone:string,email:string,appUrl:string){
- const subject=`Customer problem report: ${customer} (move ${mdy(moveDate)})`;
- const html=page(`<h2 style="margin:0 0 12px 0;">A customer reported a problem</h2>
+ const subject=`Customer message: ${customer} (move ${mdy(moveDate)})`;
+ const html=page(`<h2 style="margin:0 0 12px 0;">A customer sent a message about their move</h2>
 ${P(`<b>${esc(customer)}</b> · move on ${esc(mdy(moveDate))}<br>${email?`Email: ${esc(email)}<br>`:''}${phone?`Phone: ${esc(phone)}`:''}`)}
 <div style="margin:0 0 16px 0;padding:14px 16px;background:#f5f7f9;border-radius:8px;font-size:15px;line-height:1.55;white-space:pre-wrap;">${esc(message)}</div>
 ${P(`Reply to this email to answer ${esc(customer)} directly. It is also listed under <b>Complaints</b> in the app: <a href="${esc(appUrl)}">${esc(appUrl)}</a>`)}`);
- const text=[`A customer reported a problem`,`${customer} · move on ${mdy(moveDate)}`,email?`Email: ${email}`:'',phone?`Phone: ${phone}`:'','',message,'',`Reply to this email to answer the customer. Also listed under Complaints in the app: ${appUrl}`].filter(x=>x!==undefined).join('\n');
+ const text=[`A customer sent a message about their move`,`${customer} · move on ${mdy(moveDate)}`,email?`Email: ${email}`:'',phone?`Phone: ${phone}`:'','',message,'',`Reply to this email to answer the customer. Also listed under Complaints in the app: ${appUrl}`].filter(x=>x!==undefined).join('\n');
  return {subject,html,text};
 }
 

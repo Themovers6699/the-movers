@@ -18,7 +18,7 @@ export default function ProposalPage({token}:{token:string}){
    const d=r.data as {agreed_at:string;agreed_name:string};setP(old=>old&&{...old,agreed_at:d.agreed_at,agreed_name:d.agreed_name})}
   catch(e){setFormError(errorText(e,'Could not record your agreement. Please try again or call 469-200-6699.'))}finally{setBusy(false)}}
  return <div className="proposalpage"><div className="proposalcard">
-  <img className="proposalbanner" src="/brand/email-banner.jpg" alt="A warm hello from The Movers: Time to move"/>
+  <img className="proposalbanner" src="/brand/email-proposal.jpg" alt="The Movers: Time to move!"/>
   {error?<><h1>Written Proposal</h1><p className="error">{error}</p><p>Questions? Call us at <Phone/> or reply to the email we sent you.</p></>
   :!p?<p>Loading your proposal…</p>
   :<>

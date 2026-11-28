@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {supabase} from './supabase';
 import {errorText} from './access';
 
-export type EmailKind='estimate'|'proposal';
+export type EmailKind='estimate'|'proposal'|'review';
 export type EmailReason='date_changed'|'booked'|'manual';
 
 /** "Email the customer?" pop-up: the estimate (estimates) or the Written Proposal (booked jobs). */
@@ -13,7 +13,7 @@ export default function EmailPrompt({companyId,jobId,kind,reason='date_changed',
    if(r.error){let m='Could not reach the email service.';try{const b=await r.error.context.json();m=b.error??m}catch{/* keep generic */}throw Error(m)}
    if(r.data?.error)throw Error(r.data.error);setResult(`“${r.data?.subject}” sent to ${r.data?.to}.`);setState('sent')}
   catch(e){setResult(errorText(e,'The email could not be sent.'));setState('error')}}
- const what=kind==='estimate'?(reason==='date_changed'?'an updated estimate':'the estimate'):(reason==='date_changed'?'an updated Written Proposal':'the Written Proposal');
+ const what=kind==='review'?'a thank-you email asking for a review (Google, Facebook, Yelp, BBB)':kind==='estimate'?(reason==='date_changed'?'an updated estimate':'the estimate'):(reason==='date_changed'?'an updated Written Proposal':'the Written Proposal');
  const who=customerName?<b>{customerName}</b>:'the customer';
  return <div className="modalback" role="dialog" aria-modal="true" aria-labelledby="emailprompt-title">
   <div className="modal">

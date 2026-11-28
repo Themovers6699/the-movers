@@ -2,6 +2,7 @@ import {createClient} from 'npm:@supabase/supabase-js@2.119.0';
 
 // Emails the customer, in the owner's own format (owner's sample 2026-11-27):
 //  * estimate  -> short "Moving Estimate": banner, name, date/window, addresses, pricing, signature.
+//  * completed -> "Thank you" with review links (Google, Facebook, Yelp, BBB); not sent if the customer opted out.
 //  * booked    -> full "Written Proposal": the same plus the *** terms (company_settings.proposal_terms), an
 //                 "I agree" link, and the TxDMV Rights & Responsibilities PDF attached. A copy of exactly what was
 //                 sent is kept in job_proposals so the customer's agreement can be proven later.
@@ -44,11 +45,24 @@ export function withUnit(address:string,unit:string|null){
 type Job={id:string;status:string;customer_id:string|null;customer_name:string;move_date:string;arrival_time:string|null;arrival_window_end:string|null;pick_up_address:string;drop_off_address:string;crew_size:number;pricing_model:string;hourly_rate_cents:number|null;flat_rate_cents:number|null;service_charge_cents:number|null;deposit_required_cents:number|null;minimum_minutes:number;billing_increment_minutes:number};
 type Stop={position:number;kind:string;address:string;unit:string|null};
 type Line={name:string;quantity:number;total_cents:number};
-export type Content={kind:'estimate'|'proposal';updated:boolean;paragraphs:string[];terms:string[]};
+export type Kind='estimate'|'proposal'|'review';
+export type Content={kind:Kind;updated:boolean;paragraphs:string[];terms:string[]};
+/** Review pages (owner, 2026-11-28). */
+export const REVIEW_LINKS:[string,string][]=[
+ ['Google','https://g.page/r/CU84UO3dB-NqEBM/review'],
+ ['Facebook','https://www.facebook.com/themoverstx/'],
+ ['Yelp','https://www.yelp.com/biz/the-movers-plano?osq=the+movers&override_cta=Get+pricing+%26+availability'],
+ ['BBB','https://writeyour.review/3X7jWr2']];
+const BANNER:Record<Kind,[string,string]>={estimate:['brand/email-estimate.jpg','The Movers: Let’s get you moving'],proposal:['brand/email-proposal.jpg','The Movers: Time to move!'],review:['brand/email-review.jpg','Thanks for moving with The Movers!']};
 
 /** The proposal/estimate body as paragraphs with **bold** marks (also shown on the agreement page). */
-export function buildContent(kind:'estimate'|'proposal',job:Job,name:string,stops:Stop[],lines:Line[],terms:string,updated:boolean):Content{
+export function buildContent(kind:Kind,job:Job,name:string,stops:Stop[],lines:Line[],terms:string,updated:boolean,firstName=''):Content{
  const p:string[]=[];
+ if(kind==='review'){const hi=(firstName||name).trim();
+  return {kind,updated:false,terms:[],paragraphs:[`Hi ${hi},`,
+   `Thank you for choosing **THE MOVERS** for your move on **${mdy(job.move_date)}**! We hope everything arrived safely and that you're settling in well.`,
+   'Reviews from customers like you help other families find a mover they can trust. If you were happy with your move, would you take a minute to share your experience?',
+   'If anything wasn’t right, please reply to this email or call us at **469-200-6699**. We want to make it right.']}}
  if(updated)p.push(kind==='proposal'?'**THIS IS AN UPDATED WRITTEN PROPOSAL. IT REPLACES ANY EARLIER PROPOSAL FOR THIS MOVE.**':'**THIS IS AN UPDATED ESTIMATE. IT REPLACES ANY EARLIER ESTIMATE FOR THIS MOVE.**');
  p.push(`This is a ${kind==='proposal'?'written proposal':'moving estimate'} for **${name.toUpperCase()}** provided by **THE MOVERS**`);
  const w=shortWindow(job.arrival_time,job.arrival_window_end);
@@ -68,23 +82,25 @@ export function buildContent(kind:'estimate'|'proposal',job:Job,name:string,stop
 }
 
 export function buildEmail(c:Content,site:string,agreeUrl:string|null){
- const subject=c.kind==='proposal'?(c.updated?'Updated Written Proposal':'Written Proposal'):(c.updated?'Updated Moving Estimate':'Moving Estimate from The Movers');
+ const subject=c.kind==='review'?'Thank you for moving with The Movers!':c.kind==='proposal'?(c.updated?'Updated Written Proposal':'Written Proposal'):(c.updated?'Updated Moving Estimate':'Moving Estimate from The Movers');
  const P=(html:string,extra='')=>`<p style="margin:0 0 16px 0;font-size:15px;line-height:1.55;${extra}">${html}</p>`;
  const termsHtml=c.terms.length?`<div style="margin:4px 0 18px 0;font-size:14px;line-height:1.55;">${c.terms.map(t=>t?`<div><b>***</b> ${rich(t)}</div>`:'<div style="height:18px"></div>').join('')}</div>`:'';
  const agree=agreeUrl?`<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 14px 0;"><tr><td style="background:#dba931;border-radius:8px;"><a href="${esc(agreeUrl)}" style="display:inline-block;padding:14px 26px;font-size:16px;font-weight:bold;color:#1a3041;text-decoration:none;">I have read and agree to the terms</a></td></tr></table>`
-  +P('<b>*** PLEASE CLICK THE BUTTON ABOVE, OR RESPOND TO THIS EMAIL, TO CONFIRM THAT YOU HAVE READ AND AGREE TO THE TERMS ***</b>'):P('Ready to book, or have questions? Just reply to this email or call <b>469-200-6699</b>.');
+  +P('<b>*** PLEASE CLICK THE BUTTON ABOVE, OR RESPOND TO THIS EMAIL, TO CONFIRM THAT YOU HAVE READ AND AGREE TO THE TERMS ***</b>')
+  :c.kind==='review'?`<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 18px 0;">${REVIEW_LINKS.map(([n,u])=>`<tr><td style="padding:0 0 10px 0;"><a href="${esc(u)}" style="display:inline-block;min-width:240px;padding:12px 22px;border-radius:8px;background:#1a3041;color:#ffffff;font-size:15px;font-weight:bold;text-decoration:none;text-align:center;">&#9733; Review us on ${esc(n)}</a></td></tr>`).join('')}</table>`
+  :P('Ready to book, or have questions? Just reply to this email or call <b>469-200-6699</b>.');
  const html=`<!DOCTYPE html><html lang="en"><body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:20px 12px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;"><tr><td>
-<img src="${esc(site)}brand/email-banner.jpg" alt="A warm hello from The Movers: Time to move" width="420" style="display:block;width:420px;max-width:100%;height:auto;border:0;margin:0 0 24px 0;">
-${c.paragraphs.map(x=>P(rich(x))).join('\n')}
-${termsHtml}${agree}${P('<b>THANK YOU FOR CHOOSING THE MOVERS</b>','margin-top:18px;')}
+<img src="${esc(site)}${BANNER[c.kind][0]}" alt="${esc(BANNER[c.kind][1])}" width="600" style="display:block;width:600px;max-width:100%;height:auto;border:0;margin:0 0 24px 0;border-radius:6px;">
+${(c.kind==='review'?c.paragraphs.slice(0,-1):c.paragraphs).map(x=>P(rich(x))).join('\n')}
+${termsHtml}${agree}${c.kind==='review'?P(rich(c.paragraphs.at(-1)??'')):''}${P('<b>THANK YOU FOR CHOOSING THE MOVERS</b>','margin-top:18px;')}
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:20px;border-top:1px solid #dddddd;padding-top:16px;width:100%;"><tr>
 <td style="width:130px;vertical-align:middle;"><img src="${esc(site)}brand/logo-email.png" alt="The Movers" width="110" style="display:block;width:110px;height:auto;border:0;"></td>
 <td style="vertical-align:middle;font-size:13px;line-height:1.6;color:#333333;"><b style="font-size:15px;color:#1a1a1a;">The Movers</b><br>Our Faith Can Move Mountains<br>469-200-6699<br><a href="mailto:move@themoverz.com" style="color:#1a3041;">move@themoverz.com</a><br><a href="https://www.themoverz.com" style="color:#1a3041;">www.themoverz.com</a></td></tr></table>
 </td></tr></table></td></tr></table></body></html>`;
  const text=[...c.paragraphs.map(plain),'',...c.terms.map(t=>t?'*** '+plain(t):''),'',
-  agreeUrl?`To confirm that you have read and agree to the terms, open: ${agreeUrl}\n(or simply respond to this email)`:'Ready to book, or have questions? Reply to this email or call 469-200-6699.',
+  agreeUrl?`To confirm that you have read and agree to the terms, open: ${agreeUrl}\n(or simply respond to this email)`:c.kind==='review'?REVIEW_LINKS.map(([n,u])=>`Review us on ${n}: ${u}`).join('\n'):'Ready to book, or have questions? Reply to this email or call 469-200-6699.',
   '','THANK YOU FOR CHOOSING THE MOVERS','','The Movers · Our Faith Can Move Mountains','469-200-6699 · move@themoverz.com · www.themoverz.com'].join('\n');
  return {subject,html,text};
 }
@@ -121,17 +137,18 @@ export async function handler(req:Request){
   const jr=await admin.from('jobs').select('*').eq('company_id',data.company_id).eq('id',data.job_id).single();
   if(jr.error||!jr.data)return reply({error:'Job not found'},404);
   const job=jr.data as Job;
-  if(!['estimate','booked'].includes(job.status))return reply({error:'Emails can only be sent for estimates and booked jobs'},400);
-  const kind=job.status==='estimate'?'estimate':'proposal';
-  const cr=job.customer_id?await admin.from('customers').select('first_name,last_name,name,email').eq('company_id',data.company_id).eq('id',job.customer_id).single():{data:null,error:null};
+  const kind:Kind|null=job.status==='estimate'?'estimate':job.status==='booked'?'proposal':job.status==='completed'?'review':null;
+  if(!kind)return reply({error:'Emails can be sent for estimates, booked jobs and completed jobs only'},400);
+  const cr=job.customer_id?await admin.from('customers').select('first_name,last_name,name,email,email_opt_out').eq('company_id',data.company_id).eq('id',job.customer_id).single():{data:null,error:null};
   const to=(cr.data?.email??'').trim();
   if(!to)return reply({error:'This customer has no email address. Add one on the Customers screen first.'},400);
+  if(kind==='review'&&cr.data?.email_opt_out)return reply({error:'This customer asked not to receive emails like this (email opt-out), so no review request was sent.'},400);
   const [sr,lr,setr]=await Promise.all([admin.from('job_stops').select('position,kind,address,unit').eq('company_id',data.company_id).eq('job_id',job.id).order('position'),
    admin.from('job_line_items').select('name,quantity,total_cents').eq('company_id',data.company_id).eq('job_id',job.id).order('position'),
    admin.from('company_settings').select('proposal_terms').eq('company_id',data.company_id).single()]);
   const site=(origin&&allowed(origin)?origin:(env('APP_SITE_URL')||'https://app.themoverz.com')).replace(/\/?$/,'/');
   const name=[cr.data?.first_name,cr.data?.last_name].filter(Boolean).join(' ')||cr.data?.name||job.customer_name;
-  const content=buildContent(kind,job,name,(sr.data??[]) as Stop[],(lr.data??[]) as Line[],setr.data?.proposal_terms??'',reason==='date_changed');
+  const content=buildContent(kind,job,name,(sr.data??[]) as Stop[],(lr.data??[]) as Line[],setr.data?.proposal_terms??'',reason==='date_changed',cr.data?.first_name??'');
 
   let agreeUrl:string|null=null,proposalId:string|null=null,attachments:{filename:string;content:string}[]|undefined;
   if(kind==='proposal'){

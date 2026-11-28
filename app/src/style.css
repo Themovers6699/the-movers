@@ -156,3 +156,23 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .modalback{position:fixed;inset:0;background:rgba(15,30,45,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60}
 .modal{background:white;border-radius:12px;padding:24px;max-width:460px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25)}
 .modal h2{margin-top:0}
+/* Written Proposal: customer agreement page, status panel, terms editor */
+.proposalpage{min-height:100vh;background:#f5f7f9;padding:24px 12px}
+.proposalcard{max-width:760px;margin:0 auto;background:white;border-radius:12px;padding:28px;box-shadow:0 6px 24px rgba(20,40,60,.08);line-height:1.55}
+.proposalbanner{display:block;width:100%;max-width:440px;height:auto;margin:0 0 20px;border-radius:6px}
+.proposalcard h1{margin:0 0 14px;font-size:1.6rem}
+.proposalterms p{margin:0 0 4px}
+.proposalterms .gap{height:14px}
+.pdflink{display:inline-block;margin:10px 0;font-weight:bold}
+.agreebox{margin:20px 0;padding:18px;border:2px solid #dba931;border-radius:10px;background:#fffbf0}
+.agreebox form{display:grid;gap:12px;max-width:460px}
+.checkline{display:flex;gap:10px;align-items:flex-start;font-weight:normal}
+.checkline input{width:auto;margin-top:4px}
+.agreed{color:#1d6b3a;background:#e8f6ec;padding:10px 14px;border-radius:8px}
+.proposalfoot{display:flex;gap:16px;align-items:center;border-top:1px solid #e1e6ea;margin-top:24px;padding-top:16px;font-size:.9rem}
+.proposalfoot img{width:96px;height:auto}
+.historylist{margin:8px 0 0;padding-left:18px;font-size:.9rem}
+.termsgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.termsgrid textarea{width:100%;font-family:inherit;font-size:.9rem;line-height:1.45}
+.termspreview{max-height:520px;overflow:auto;border:1px solid #e1e6ea;border-radius:8px;padding:12px;font-size:.9rem;background:#fafbfc}
+@media (max-width:800px){.termsgrid{grid-template-columns:1fr}.proposalcard{padding:18px}}

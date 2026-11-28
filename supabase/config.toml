@@ -15,8 +15,9 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.movers-customer-email]
-# Called from the browser with the office user's JWT; keep verification ON.
-verify_jwt = true
+# OFF on purpose: also called by pg_cron (x-movers-cron secret) and by customers' problem-report page (link code).
+# Office requests are still verified inside the function (auth.getUser + office role).
+verify_jwt = false
 
 [functions.movers-sms-webhook]
 # Twilio does not send a Supabase JWT. The function verifies Twilio's signature instead.

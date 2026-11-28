@@ -147,3 +147,12 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .crewchip small{font-size:11px;color:#55758a}
 .crewchip button{border:0;background:white;border-radius:50%;width:26px;height:26px;cursor:pointer;color:#a33c38;font-weight:700}
 .crewpicker select{max-width:420px;background:white;color:#1a3041;border-color:#d5dee5;margin:0}
+/* Drag and drop on the dispatch calendar */
+.dispatch-job[draggable="true"]{cursor:grab}
+.dispatch-job.dragging{opacity:.45}
+.calendar-day.droptarget{outline:2px dashed #b9cfe4;outline-offset:-4px}
+.calendar-day.dropover{background:#fbf3dc;outline-color:#dba931}
+/* Pop-up dialog */
+.modalback{position:fixed;inset:0;background:rgba(15,30,45,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60}
+.modal{background:white;border-radius:12px;padding:24px;max-width:460px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.modal h2{margin-top:0}

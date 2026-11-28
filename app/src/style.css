@@ -176,3 +176,8 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px s
 .termsgrid textarea{width:100%;font-family:inherit;font-size:.9rem;line-height:1.45}
 .termspreview{max-height:520px;overflow:auto;border:1px solid #e1e6ea;border-radius:8px;padding:12px;font-size:.9rem;background:#fafbfc}
 @media (max-width:800px){.termsgrid{grid-template-columns:1fr}.proposalcard{padding:18px}}
+/* Cancelled jobs */
+.cancelledtable td{vertical-align:top}
+.cancelledtable .actions{white-space:nowrap}
+.restorechoices{display:grid;gap:10px;margin:12px 0}
+.restorechoices input[type=date]{max-width:220px;margin-left:28px}
